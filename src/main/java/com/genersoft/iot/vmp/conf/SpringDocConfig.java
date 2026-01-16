@@ -7,12 +7,12 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.annotation.Order;
+import org.springdoc.core.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
 /**
  * @author lin
@@ -22,7 +22,7 @@ import org.springframework.core.annotation.Order;
 @ConditionalOnProperty(value = "user-settings.doc-enable", havingValue = "true", matchIfMissing = true)
 public class SpringDocConfig {
 
-    @Value("${doc.enabled: true}")
+    @Value("${user-settings.doc-enabled: true}")
     private boolean enable;
 
     @Bean
@@ -30,7 +30,9 @@ public class SpringDocConfig {
         Contact contact = new Contact();
         contact.setName("pan");
         contact.setEmail("648540858@qq.com");
-
+        if (!enable) {
+            return null;
+        }
         return new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes(JwtUtils.HEADER, new SecurityScheme()
@@ -39,7 +41,7 @@ public class SpringDocConfig {
                 .info(new Info().title("WVP-PRO 接口文档")
                         .contact(contact)
                         .description("开箱即用的28181协议视频平台。 <br/>" +
-                                "1. 打开<a href='/doc.html#/1.%20全部/用户管理/login'>登录</a>接口" +
+                                "1. 打开<a href='/doc.html#/1.%20全部/用户管理/login_1'>登录</a>接口" +
                                 " 登录成功后返回AccessToken。 <br/>" +
                                 "2. 填写到AccessToken到参数值 <a href='/doc.html#/Authorize/1.%20全部'>Token配置</a>  <br/>" +
                                 "后续接口就可以直接测试了")

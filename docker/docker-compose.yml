@@ -111,7 +111,7 @@ services:
       ZLM_SERCERT: su6TiedN2rVAmBbIDX0aa0QTiBJLBdcf
 
       MediaHttp: ${WebHttp:-8080}
-      #MediaHttps: ${WebHttps:-8081}
+      MediaHttps: ${WebHttps:-8183}
       MediaRtmp: ${MediaRtmp:-10935}
       MediaRtsp: ${MediaRtsp:-5540}
       MediaRtp: ${MediaRtp:-10000}
@@ -140,11 +140,13 @@ services:
       dockerfile: ./docker/nginx/Dockerfile  # 相对于上下文路径的Dockerfile位置
     ports:
       - "${WebHttp:-8080}:8080"
+      - "${WebHttps:-8183}:8183"
     depends_on:
       - polaris-wvp
     volumes:
       - ./nginx/templates/:/etc/nginx/templates
       - ./logs/nginx:/var/log/nginx
+      - ./wvp/wvp/:/opt/ylcx/wvp/
     environment:
       # 流链接的IP
       Stream_IP: ${Stream_IP}

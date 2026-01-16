@@ -1,13 +1,14 @@
-FROM ringcentral/jdk:11 AS builder
+#FROM ringcentral/jdk:11 AS builder
+FROM maven:3.8.7-eclipse-temurin-17-alpine AS builder
 
 EXPOSE 18978/tcp
 EXPOSE 8116/tcp
 EXPOSE 8116/udp
 EXPOSE 8080/tcp
 
-#RUN apt-get update && \
+#RUN apt update && \
          #DEBIAN_FRONTEND="noninteractive" \
-         #apt-get install -y --no-install-recommends \
+         #apt install -y --no-install-recommends \
          #wget \
          #cmake \
          #maven \
@@ -21,8 +22,8 @@ EXPOSE 8080/tcp
          #openssl \
          #libssl-dev \
          #gdb && \
-         #apt-get autoremove -y && \
-         #apt-get clean -y && \
+         #apt autoremove -y && \
+         #apt clean -y && \
          #rm -rf /var/lib/apt/lists/*
 
 ## install jdk1.8
@@ -47,9 +48,9 @@ EXPOSE 8080/tcp
 RUN java -version && javac -version
 
 #RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources && \
-RUN apt-get update && \
-    apt-get install -y maven && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt update && \
+ #   apt install -y maven && \
+  #  rm -rf /var/lib/apt/lists/*
     
 
 COPY . /build
@@ -60,7 +61,8 @@ WORKDIR /build/target
 RUN mv wvp-pro-*.jar wvp.jar
 
 
-FROM ringcentral/jdk:11
+#FROM ringcentral/jdk:11
+FROM openjdk:17-jdk-alpine
 RUN mkdir -p /opt/wvp
 WORKDIR /opt/wvp
 COPY --from=builder /build/target /opt/wvp

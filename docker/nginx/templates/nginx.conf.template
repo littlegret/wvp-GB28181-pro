@@ -6,6 +6,34 @@ server {
 		root /opt/dist;
         index  index.html index.htm;
     }
+    location = /doc.html {
+        proxy_pass http://polaris-wvp:18978/doc.html;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    location /swagger-ui/ {
+        proxy_pass http://polaris-wvp:18978/swagger-ui/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    location /webjars/ {
+        proxy_pass http://polaris-wvp:18978/webjars/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    location /v3/api-docs {
+        proxy_pass http://polaris-wvp:18978/v3/api-docs;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header REMOTE-HOST $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
 	location /record_proxy/{
 		 proxy_set_header Host $http_host;
 		 proxy_set_header X-Real-IP $remote_addr;
@@ -59,6 +87,13 @@ server {
         proxy_read_timeout 300s;
     }
 
+    # 1. 代理 ZLM 的 API 接口 (关键：让 WVP 通过 8080 也能管 ZLM)
+    location ^~ /index/api/ {
+        proxy_pass http://polaris-media:80/index/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
     # 仅允许代理/rtp/开头的路径
     location ^~ /rtp/ {
         # 代理到ZLMediakit服务
@@ -74,6 +109,13 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_set_header Sec-WebSocket-Protocol $http_sec_websocket_protocol;
+        proxy_set_header Sec-WebSocket-Version $http_sec_websocket_version;
+        proxy_set_header Sec-WebSocket-Key $http_sec_websocket_key;
+
+        # 核心：必须加这两行，解决视频流卡顿或无法建立连接
+        proxy_buffering off;
+        proxy_request_buffering off;
         
         # 超时设置，根据实际需求调整
         proxy_connect_timeout 60s;
@@ -96,6 +138,13 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_set_header Sec-WebSocket-Protocol $http_sec_websocket_protocol;
+        proxy_set_header Sec-WebSocket-Version $http_sec_websocket_version;
+        proxy_set_header Sec-WebSocket-Key $http_sec_websocket_key;
+
+        # 核心：必须加这两行，解决视频流卡顿或无法建立连接
+        proxy_buffering off;
+        proxy_request_buffering off;
         
         # 超时设置，根据实际需求调整
         proxy_connect_timeout 60s;
@@ -106,5 +155,91 @@ server {
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
         root   html;
+    }
+}
+
+server {
+    # 1. 监听标准 HTTPS 端口
+    listen 8183 ssl;
+    server_name localhost; # 建议后续绑定域名
+
+    # --- SSL 证书路径 (根据实际挂载路径修改) ---
+    ssl_certificate     /opt/ylcx/wvp/ssl/server.crt;
+    ssl_certificate_key /opt/ylcx/wvp/ssl/server.key;
+
+    # 这一行决定了前端是否能正确识别 HTTPS 环境
+    proxy_set_header X-Forwarded-Proto https;
+
+    # SSL 优化
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # 2. 前端静态资源
+    location / {
+        root /opt/dist;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 3. WVP API 代理 (18978 端口)
+    location /api/ {
+        proxy_pass http://polaris-wvp:18978;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 处理录像下载地址替换逻辑
+        set $original_host ${Stream_IP};
+        sub_filter "http://$original_host/index/api/downloadFile" "mediaserver/api/downloadFile";
+        sub_filter "https://$original_host/index/api/downloadFile" "mediaserver/api/downloadFile";
+        sub_filter_once off;
+        sub_filter_types application/json;
+    }
+
+    # 4. WVP 管理/文档接口
+    location ~* ^/(doc.html|swagger-ui|webjars|v3/api-docs) {
+        proxy_pass http://polaris-wvp:18978;
+        proxy_set_header Host $http_host;
+    }
+
+    # 5. ZLMediaKit 管理接口 (供 WVP 内部调用)
+    location ^~ /index/api/ {
+        proxy_pass http://polaris-media:80/index/api/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # 6. 核心：视频流代理 (支持 WSS)
+    location ^~ /rtp/ {
+        proxy_pass http://polaris-media:80;
+        
+        # 必须有的 WebSocket 协议切换头
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 视频流必须关闭缓存
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_read_timeout 3600s;
+    }
+
+    # 7. 下载与录像代理
+    location /mediaserver/api/downloadFile {
+        proxy_pass http://polaris-media:80/index/api/downloadFile;
+        proxy_set_header Host $http_host;
+    }
+
+    location ^~ /mp4_record/ {
+        proxy_pass http://polaris-media:80;
+        proxy_set_header Host $http_host;
+        proxy_buffering off;
     }
 }

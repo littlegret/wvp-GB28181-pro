@@ -148,7 +148,7 @@ sy:
 #zlm 默认服务器配置
 media:
     # [必须修改] zlm服务器唯一id，用于触发hook时区别是哪台服务器,general.mediaServerId
-    id:
+    id: polaris
     # [必须修改] zlm服务器的内网IP
     ip: 192.168.0.100
     # [可选] 有公网IP就配置公网IP, 不可用域名

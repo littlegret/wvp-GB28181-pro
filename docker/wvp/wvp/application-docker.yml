@@ -46,7 +46,15 @@ server:
     ssl:
         # [可选] 是否开启HTTPS访问
         # docker里运行，内部不需要HTTPS
-        enabled: false
+        # 启用HTTPS
+        enabled: true
+        key-store: file:/opt/ylcx/wvp/ssl/server.p12
+        key-store-password: changeit
+        key-store-type: PKCS12
+        key-alias: wvp-server
+        # HTTP重定向到HTTPS
+    http:
+        port: 18979
 # 作为28181服务器的配置
 sip:
     # [必须修改] 本机的IP，对应你的网卡，监听什么ip就是使用什么网卡，
@@ -55,9 +63,9 @@ sip:
     # 请不要使用127.0.0.1，任何包括localhost在内的域名都是不可以的。
     ip: 0.0.0.0
     # [可选] 没有任何业务需求，仅仅是在前端展示的时候用
-    show-ip: ${SIP_ShowIP}
+    show-ip: ${SIP_ShowIP:8.134.202.195}
     # [可选]
-    port: ${SIP_Port:8116}
+    port: ${SIP_Port:5060}
     # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
     # 后两位为行业编码，定义参照附录D.3
     # 3701020049标识山东济南历下区 信息行业接入
@@ -82,8 +90,9 @@ sip:
 media:
   id: polaris
   # [必须修改] ZLM 内网IP与端口
-  ip: ${ZLM_HOST:127.0.0.1}
-  http-port: 80
+#   ip: ${ZLM_HOST:127.0.0.1}
+  ip: polaris-nginx
+  http-port: 8080
   # [可选] 返回流地址时的ip，置空使用 media.ip
   stream-ip: ${Stream_IP}
   # [可选] wvp在国标信令中使用的ip，此ip为摄像机可以访问到的ip， 置空使用 media.ip
@@ -91,15 +100,17 @@ media:
   # [可选] zlm服务器访问WVP所使用的IP, 默认使用127.0.0.1，zlm和wvp没有部署在同一台服务器时必须配置
   hook-ip: ${ZLM_HOOK_HOST}
   # [可选] sslport
-  http-ssl-port: 0
-  flv-port: ${MediaHttp:}
-  flv-ssl-port: ${MediaHttps:}
-  ws-flv-port: ${MediaHttp:}
-  ws-flv-ssl-port: ${MediaHttps:}
-  rtp-proxy-port: ${MediaRtp:}
-  rtmp-port: ${MediaRtmp:}
+  http-ssl-port: 8183
+  flv-port: ${MediaHttp:8080}
+  flv-ssl-port: ${MediaHttps:8183}
+  ws-flv-port: ${MediaHttp:8080}
+  ws-flv-ssl-port: ${MediaHttps:8183}
+  ws-port: ${MediaHttp:8080}
+  wss-port: ${MediaHttps:8183}
+  rtp-proxy-port: ${MediaRtp:8080}
+  rtmp-port: ${MediaRtmp:8080}
   rtmp-ssl-port: 0
-  rtsp-port: ${MediaRtsp:}
+  rtsp-port: ${MediaRtsp:8080}
   rtsp-ssl-port: 0
   # [可选] 是否自动配置ZLM, 如果希望手动配置ZLM, 可以设为false, 不建议新接触的用户修改
   auto-config: true
@@ -119,6 +130,7 @@ media:
   record-assist-port: 0
 user-settings:
     auto-apply-play: true
+    doc-enable: true
     play-timeout: 30000
     wait-track: false
     record-push-live: ${RecordPushLive:false}
@@ -139,4 +151,5 @@ user-settings:
     jwkFile: classpath:xxxxxxxxxxx.json
 logging:
   config: classpath:logback-spring.xml
+
 

@@ -164,8 +164,8 @@ server {
     server_name localhost; # 建议后续绑定域名
 
     # --- SSL 证书路径 (根据实际挂载路径修改) ---
-    ssl_certificate     /opt/ylcx/wvp/ssl/server.crt;
-    ssl_certificate_key /opt/ylcx/wvp/ssl/server.key;
+    ssl_certificate     /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
 
     # 这一行决定了前端是否能正确识别 HTTPS 环境
     proxy_set_header X-Forwarded-Proto https;
@@ -175,6 +175,10 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
+    
+    # 自签证书配置
+    ssl_verify_client off;
+    ssl_verify_depth 2;
 
     # 2. 前端静态资源
     location / {

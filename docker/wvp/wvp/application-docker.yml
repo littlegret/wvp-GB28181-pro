@@ -48,10 +48,10 @@ server:
         # docker里运行，内部不需要HTTPS
         # 启用HTTPS
         enabled: true
-        key-store: file:/opt/ylcx/wvp/ssl/server.p12
-        key-store-password: changeit
-        key-store-type: PKCS12
-        key-alias: wvp-server
+        # PEM 编码证书
+        certificate: cert.pem
+        #   私钥文件
+        certificate-private-key: key.pem  
         # HTTP重定向到HTTPS
     http:
         port: 18979

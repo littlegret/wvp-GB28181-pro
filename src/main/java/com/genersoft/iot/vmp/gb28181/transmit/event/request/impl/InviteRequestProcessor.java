@@ -611,7 +611,7 @@ public class InviteRequestProcessor extends SIPRequestProcessorParent implements
                 content.append("m=audio " + sendRtpItem.getLocalPort() + " RTP/AVP 8\r\n");
             }
 
-            content.append("a=rtpmap:8 PCMA/8000/1\r\n");
+            content.append("a=rtpmap:8 PCMA/8097/1\r\n");
 
             content.append("a=sendonly\r\n");
             if (sendRtpItem.isTcp()) {

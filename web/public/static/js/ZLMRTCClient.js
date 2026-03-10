@@ -3794,7 +3794,7 @@ var ZLMRTCClient = (function (exports) {
 	          }
 	        } else if (transceiver.kind === 'audio') {
 	          sdp$1 += 'm=audio 0 UDP/TLS/RTP/SAVPF 0\r\n' +
-	              'a=rtpmap:0 PCMU/8000\r\n';
+	              'a=rtpmap:0 PCMU/8097\r\n';
 	        } else if (transceiver.kind === 'video') {
 	          sdp$1 += 'm=video 0 UDP/TLS/RTP/SAVPF 120\r\n' +
 	              'a=rtpmap:120 VP8/90000\r\n';

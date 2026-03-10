@@ -73,7 +73,7 @@ server {
     # 将mediaserver/record转发到目标地址
     location /mediaserver/api/downloadFile {
         # 目标服务器地址
-        proxy_pass http://polaris-media:80/index/api/downloadFile;
+        proxy_pass http://polaris-mediav2:80/index/api/downloadFile;
         
         # 以下是常用的反向代理设置
         proxy_set_header Host $host;
@@ -89,7 +89,7 @@ server {
 
     # 1. 代理 ZLM 的 API 接口 (关键：让 WVP 通过 8080 也能管 ZLM)
     location ^~ /index/api/ {
-        proxy_pass http://polaris-media:80/index/api/;
+        proxy_pass http://polaris-mediav2:80/index/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
@@ -97,7 +97,7 @@ server {
     # 仅允许代理/rtp/开头的路径
     location ^~ /rtp/ {
         # 代理到ZLMediakit服务
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-mediav2:80;
         
         # 基础HTTP代理配置
         proxy_set_header Host $host;
@@ -126,7 +126,7 @@ server {
     # 仅允许代理/rtp/开头的路径
     location ^~ /mp4_record/ {
         # 代理到ZLMediakit服务
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-mediav2:80;
         
         # 基础HTTP代理配置
         proxy_set_header Host $host;
@@ -175,8 +175,8 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
-    
-    # 自签证书配置
+
+        # 自签证书配置
     ssl_verify_client off;
     ssl_verify_depth 2;
 
@@ -211,14 +211,14 @@ server {
 
     # 5. ZLMediaKit 管理接口 (供 WVP 内部调用)
     location ^~ /index/api/ {
-        proxy_pass http://polaris-media:80/index/api/;
+        proxy_pass http://polaris-mediav2:80/index/api/;
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
     # 6. 核心：视频流代理 (支持 WSS)
     location ^~ /rtp/ {
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-mediav2:80;
         
         # 必须有的 WebSocket 协议切换头
         proxy_http_version 1.1;
@@ -237,12 +237,12 @@ server {
 
     # 7. 下载与录像代理
     location /mediaserver/api/downloadFile {
-        proxy_pass http://polaris-media:80/index/api/downloadFile;
+        proxy_pass http://polaris-mediav2:80/index/api/downloadFile;
         proxy_set_header Host $http_host;
     }
 
     location ^~ /mp4_record/ {
-        proxy_pass http://polaris-media:80;
+        proxy_pass http://polaris-mediav2:80;
         proxy_set_header Host $http_host;
         proxy_buffering off;
     }

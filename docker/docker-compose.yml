@@ -53,9 +53,10 @@ services:
           '--lower-case-table-names=1'
         ]
 
-  polaris-media:
+  polaris-mediav2:
     image: zlmediakit/zlmediakit:master  # 替换为官方镜像
     restart: always
+    # stop_grace_period: 30s
     networks:
       - media-net
     ports:
@@ -69,7 +70,8 @@ services:
      #- "45540:45540/tcp"   # [收流]RTSPS 无效
       - "${MediaRtp:-10000}:${MediaRtp:-10000}/tcp"   # [收流]RTP   
       - "${MediaRtp:-10000}:${MediaRtp:-10000}/udp"   # [收流]RTP   
-      - 8000:8000    
+      - 8097:8097    
+      - 30000-30506:30000-30506
     volumes:
       - ./volumes/video:/opt/media/bin/www/record/
       - ./logs/media:/opt/media/log/
@@ -95,7 +97,7 @@ services:
     depends_on:
       - polaris-redis
       - polaris-mysql
-      - polaris-media
+      - polaris-mediav2
     volumes:
       - ./wvp/config:/opt/wvp/config
       - ./wvp/wvp/:/opt/ylcx/wvp/
@@ -108,7 +110,7 @@ services:
       SDP_IP: ${SDP_IP}
       # [可选] zlm服务器访问WVP所使用的IP, 默认使用127.0.0.1，zlm和wvp没有部署在同一台服务器时必须配置
       ZLM_HOOK_HOST: polaris-wvp
-      ZLM_HOST: polaris-media
+      ZLM_HOST: polaris-mediav2
       ZLM_SERCERT: su6TiedN2rVAmBbIDX0aa0QTiBJLBdcf
 
       MediaHttp: ${WebHttp:-8080}

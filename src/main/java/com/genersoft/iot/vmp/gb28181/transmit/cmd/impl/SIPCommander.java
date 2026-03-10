@@ -533,7 +533,7 @@ public class SIPCommander implements ISIPCommander {
         content.append("a=setup:passive\r\n");
         content.append("a=connection:new\r\n");
         content.append("a=sendrecv\r\n");
-        content.append("a=rtpmap:8 PCMA/8000\r\n");
+        content.append("a=rtpmap:8 PCMA/8097\r\n");
 
         content.append("y=" + sendRtpItem.getSsrc() + "\r\n");//ssrc
         // f字段:f= v/编码格式/分辨率/帧率/码率类型/码率大小a/编码格式/码率大小/采样率

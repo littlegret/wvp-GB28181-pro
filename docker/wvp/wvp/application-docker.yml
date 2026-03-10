@@ -47,12 +47,11 @@ server:
         # [可选] 是否开启HTTPS访问
         # docker里运行，内部不需要HTTPS
         # 启用HTTPS
-        enabled: true
+        enabled: false
         # PEM 编码证书
         certificate: cert.pem
         #   私钥文件
-        certificate-private-key: key.pem  
-        # HTTP重定向到HTTPS
+        certificate-private-key: key.pem        # HTTP重定向到HTTPS
     http:
         port: 18979
 # 作为28181服务器的配置
@@ -66,6 +65,7 @@ sip:
     show-ip: ${SIP_ShowIP:8.134.202.195}
     # [可选]
     port: ${SIP_Port:5060}
+    send-by-alias: true
     # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
     # 后两位为行业编码，定义参照附录D.3
     # 3701020049标识山东济南历下区 信息行业接入
@@ -123,7 +123,7 @@ media:
     # [可选] 
     port-range: 30000,30500 
     # [可选] 
-    send-port-range: 50502,50506 
+    send-port-range: 30502,30506 
 
   record-path: /opt/media/bin/www/record/
   record-day: 7

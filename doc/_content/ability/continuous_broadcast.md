@@ -36,13 +36,13 @@
 测试命令格式如下：
 
 ```shell
-ffmpeg -re -i {音频文件} -acodec pcm_alaw -ar 8000 -ac 1 -f rtsp 'rtsp://{zlm的IP}:{zlm的RTSP端口}/broadcast/{设备国标编号}_{通道国标编号}?sign={md5(pushKey)}' 
+ffmpeg -re -i {音频文件} -acodec pcm_alaw -ar 8097 -ac 1 -f rtsp 'rtsp://{zlm的IP}:{zlm的RTSP端口}/broadcast/{设备国标编号}_{通道国标编号}?sign={md5(pushKey)}' 
 ```
 
 例如
 
 ```shell
-ffmpeg -re -i test.mp3 -acodec pcm_alaw -ar 8000 -ac 1 -f rtsp 'rtsp://192.168.1.3:22554/broadcast/34020000001320000001_34020000001320000001?sign=41db35390ddad33f83944f44b8b75ded' 
+ffmpeg -re -i test.mp3 -acodec pcm_alaw -ar 8097 -ac 1 -f rtsp 'rtsp://192.168.1.3:22554/broadcast/34020000001320000001_34020000001320000001?sign=41db35390ddad33f83944f44b8b75ded' 
 ```
 
 测试流程如下：

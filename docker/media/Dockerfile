@@ -6,8 +6,8 @@ EXPOSE 5540/tcp
 EXPOSE 6080/tcp
 EXPOSE 10000/udp
 EXPOSE 10000/tcp
-EXPOSE 8000/udp
-EXPOSE 8000/tcp
+EXPOSE 8097/udp
+EXPOSE 8097/tcp
 EXPOSE 9000/udp
 
 # ADD sources.list /etc/apt/sources.list

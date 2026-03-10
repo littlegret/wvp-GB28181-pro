@@ -33,3 +33,5 @@ certificates
 /docker/wvp/config/jwk.json
 
 /docker/wvp/ssl/*
+/docker/nginx/ssl/*
+
